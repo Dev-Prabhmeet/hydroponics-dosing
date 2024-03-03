@@ -1,8 +1,9 @@
 # Define variables volumes in Liters
+# if deviation any delta ion is higer than 5% then run the whole program
 vol_target = 10
 vol_current = 8
 
-# Define variables for PPM values
+# Define target variables for PPM values
 nitrogen_ppm = 203
 potassium_ppm = 254.15
 calcium_ppm = 180.351
@@ -12,7 +13,7 @@ sulphur_ppm = 48.09
 phosphor_ppm = 34.0714
 magni_ppm = 38.88
 
-# Define variables for nutrient ratios (the reverse ratios would be nice to hav eas well)
+# Define variables for nutrient ratios (the reverse ratios would be nice to have as well)
 calcium_nitrate_Ca_NNo3 = 1.36
 nitrate_calcium_Ca_NNo3 = 1/calcium_nitrate_Ca_NNo3
 mkp_KPPO4 = 1.24
@@ -24,13 +25,13 @@ potassium_sulphate_KSSO4 = 2.26
 nitrogen_measured_ppm = 203 #203
 potassium_measured_ppm = 196 #196
 calcium_measured_ppm = 200
-sulphur_measured_ppm = 40 # 50
+sulphur_measured_ppm = 0 # 50 this value is not available
 
 # Define variables for source water PPM values
 nitrogen_source_ppm = 10
 potassium_source_ppm = 22
 calcium_source_ppm = 90
-sulphur_source_ppm = 15
+sulphur_source_ppm = 0
 phosphate_souce_ppm = 30
 magni_souce_ppm = 95
 
@@ -111,7 +112,8 @@ def calculate_Deltaion(target_ion_con, deter_ion_con, vol_current, source_ion_co
 updated_delta_nitrogen = initial_delta_nitrogen = round(calculate_Deltaion(nitrogen_ppm, nitrogen_measured_ppm, vol_current, nitrogen_source_ppm, vol_target), TWO_DECIMAL)
 updated_delta_calcium = initial_delta_calcium = round(calculate_Deltaion(calcium_ppm, calcium_measured_ppm, vol_current, calcium_source_ppm, vol_target), TWO_DECIMAL)
 updated_delta_potassium = initial_delta_potassium = round(calculate_Deltaion(potassium_ppm, potassium_measured_ppm, vol_current, potassium_source_ppm, vol_target), TWO_DECIMAL)
-updated_delta_sulphur = initial_delta_sulphur = round(calculate_Deltaion(sulphur_ppm, sulphur_measured_ppm, vol_current, sulphur_source_ppm, vol_target), TWO_DECIMAL)
+# updated_delta_sulphur = initial_delta_sulphur = round(calculate_Deltaion(sulphur_ppm, sulphur_measured_ppm, vol_current, sulphur_source_ppm, vol_target), TWO_DECIMAL)
+updated_delta_sulphur = initial_delta_sulphur = 0
 
 
 
@@ -127,7 +129,8 @@ print("Delta N after substarcting NO3H38%:", updated_delta_nitrogen, "mg")
 
 # Function to calculate milligrams per part dosing
 def mg_p_dosing(ppm):
-    dosing = (ppm / total_conce_NCaK) * (updated_delta_nitrogen + updated_delta_calcium + updated_delta_potassium)
+    # dosing = (ppm / total_conce_NCaK) * (updated_delta_nitrogen + updated_delta_calcium + updated_delta_potassium)
+    dosing = (ppm / total_conce_NCaK) * (initial_delta_nitrogen + initial_delta_calcium + initial_delta_potassium)
     return dosing
 
 # Function to calculate ratios of ions
@@ -168,7 +171,9 @@ if initial_delta_calcium > 0:
 
     added_N_with_CaNO3 = round(ratio_calculation(initial_delta_calcium, calcium_nitrate_Ca_NNo3), TWO_DECIMAL)
     added_Ca_with_CaNO3 = round(ratio_calculation(initial_delta_calcium, nitrate_calcium_Ca_NNo3), TWO_DECIMAL)
+
     updated_delta_calcium = round(updated_delta_calcium - added_Ca_with_CaNO3, TWO_DECIMAL)
+
     updated_delta_nitrogen = round(updated_delta_nitrogen - added_N_with_CaNO3, TWO_DECIMAL)
     print("N in CaNO3:", added_N_with_CaNO3, "mg")
 
@@ -272,8 +277,7 @@ micro_ml = round((micro_mg/10000) * 1000, TWO_DECIMAL)
 
 print("Micro nutrient injection:", micro_ml, "ml")
 print("Iron nutrient injection:", iron_ml, "ml\n")
-print("On time iron pump:", round(flow_Rate(iron_mg, iron_concen), 4), "minutes")
-print("On time micro nutrients pump:", round(flow_Rate(micro_mg, micro_Nutrient_concen), 4), "minutes")
-print("Iron nutrient injection:", iron_ml, "ml\n")
+# print("On time iron pump:", round(flow_Rate(iron_mg, iron_concen), 4), "minutes")
+# print("On time micro nutrients pump:", round(flow_Rate(micro_mg, micro_Nutrient_concen), 4), "minutes")
 
 print("Top up volume water:", round(volume_NS()/1000, TWO_DECIMAL), "liters\n")
